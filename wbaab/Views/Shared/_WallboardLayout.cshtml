@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Wallboard Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="http://code.ionicframework.com/ionicons/2.0.0/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+    @Styles.Render("~/wallboard/css")
+    @Scripts.Render("~/endless/jquery")
+</head>
+<body class="overflow-hidden">
+    <!-- Overlay Div -->
+    <div id="overlay" class="transparent"></div>  
+    <div id="wrapper" class="preload">        
+        @RenderBody()
+        @*<div id="main-container">
+        </div>*@
+    </div>
+    @Scripts.Render("~/wallboard/js")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

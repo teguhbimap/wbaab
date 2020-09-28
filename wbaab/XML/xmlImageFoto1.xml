@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wallboardProjects>
+  <wallboardImageFoto1>
+    <imageFoto1SeqCd>2</imageFoto1SeqCd>
+    <imageFoto1Path>user2.jpg</imageFoto1Path>
+    <imageFoto1Title>Gallery2</imageFoto1Title>
+    <imageFoto1Note>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare dolor, quis ullamcorper ligula sodales at.</imageFoto1Note>
+  </wallboardImageFoto1>
+  <wallboardImageFoto1>
+    <imageFoto1SeqCd>3</imageFoto1SeqCd>
+    <imageFoto1Path>user3.jpg</imageFoto1Path>
+    <imageFoto1Title>Gallery3</imageFoto1Title>
+    <imageFoto1Note>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare dolor, quis ullamcorper ligula sodales at.</imageFoto1Note>
+  </wallboardImageFoto1>
+  <wallboardImageFoto1>
+    <imageFoto1SeqCd>1</imageFoto1SeqCd>
+    <imageFoto1Path>user.jpg</imageFoto1Path>
+    <imageFoto1Title>Gallery1</imageFoto1Title>
+    <imageFoto1Note>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare dolor, quis ullamcorper ligula sodales at.</imageFoto1Note>
+  </wallboardImageFoto1>
+</wallboardProjects>

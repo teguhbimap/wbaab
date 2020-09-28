@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Wallboard Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+        <link href="http://code.ionicframework.com/ionicons/2.0.0/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+    @Styles.Render("~/admin/css")
+    @Scripts.Render("~/endless/jquery")
+   @* <link href="@Url.Content("~/admin/css")" rel="Stylesheet" type="text/css" />
+    <script src="@Url.Content("~/endless/jquery")" />
+        <link href="~/admin/css" rel="Stylesheet" type="text/css">*@
+
+
+
+</head>
+<body class="overflow-hidden">
+    <div id="overlay" class="transparent"></div>
+
+    <a href="" id="theme-setting-icon"><i class="fa fa-cog fa-lg"></i></a>
+    <div id="theme-setting">
+        <div class="title">
+            <strong class="no-margin">Skin Color</strong>
+        </div>
+        <div class="theme-box">
+            <a class="theme-color" style="background:#323447" id="default"></a>
+            <a class="theme-color" style="background:#efefef" id="skin-1"></a>
+            <a class="theme-color" style="background:#a93922" id="skin-2"></a>
+            <a class="theme-color" style="background:#3e6b96" id="skin-3"></a>
+            <a class="theme-color" style="background:#635247" id="skin-4"></a>
+            <a class="theme-color" style="background:#3a3a3a" id="skin-5"></a>
+            <a class="theme-color" style="background:#495B6C" id="skin-6"></a>
+        </div>
+        <div class="title">
+            <strong class="no-margin">Sidebar Menu</strong>
+        </div>
+        <div class="theme-box">
+            <label class="label-checkbox">
+                <input type="checkbox" checked id="fixedSidebar">
+                <span class="custom-checkbox"></span>
+                Fixed Sidebar
+            </label>
+        </div>
+    </div><!-- /theme-setting -->
+
+    <div id="wrapper" class="preload">
+        <div id="top-nav" class="fixed skin-6">
+            <a href="#" class="brand">
+                <span>Wallboard</span>
+                <span class="text-toggle"> Admin</span>
+            </a><!-- /brand -->
+            <button type="button" class="navbar-toggle pull-left" id="sidebarToggle">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <button type="button" class="navbar-toggle pull-left hide-menu" id="menuToggle">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+        </div><!-- /top-nav-->
+
+        <aside class="fixed skin-6">
+            <div class="sidebar-inner scrollable-sidebar">
+                <div class="size-toggle">
+                    <a class="btn btn-sm" id="sizeToggle">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                </div><!-- /size-toggle -->
+
+                <div class="main-menu">
+                    <ul>
+                        <li class="openable">
+                            <a href="#">
+                                <span class="menu-icon">
+                                    <i class="fa fa-desktop fa-lg"></i>
+                                </span>
+                                <span class="text">
+                                    Dashboard
+                                </span>
+                                <span class="menu-hover"></span>
+                            </a>
+                            <ul class="submenu">
+                                <li><a href="/Wallboard/View1"><span class="submenu-label">View1</span></a></li>
+                                <li><a href="/Wallboard/View2"><span class="submenu-label">View2</span></a></li>
+                            </ul>
+                        </li>
+                        <li id="adminWallboard" class="openable open">
+                            <a href="#">
+                                <span class="menu-icon">
+                                    <i class="fa fa-file-text fa-lg"></i>
+                                </span>
+                                <span class="text">
+                                    Admin
+                                </span>
+                                <span class="menu-hover"></span>
+                            </a>
+                            <ul class="submenu">
+                                <li id="adminThreshold"><a href="/Admin/Threshold"><span class="submenu-label">Threshold Aux Reason</span></a></li>
+                                <li id="adminRunningText"><a href="/Admin/RunningText"><span class="submenu-label">Running Text</span></a></li>
+                                <li id="adminVideo"><a href="/Admin/Video"><span class="submenu-label">Video</span></a></li>
+                                <li id="adminImageSlide"><a href="/Admin/ImageSlide"><span class="submenu-label">Image Slide</span></a></li>
+                                <li id="adminImageFoto1"><a href="/Admin/ImageFoto1"><span class="submenu-label">Image Foto1</span></a></li>
+                                <li id="adminImageFoto2"><a href="/Admin/ImageFoto2"><span class="submenu-label">Image Foto2</span></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!-- /main-menu -->
+            </div><!-- /sidebar-inner -->
+        </aside>
+
+        <div id="main-container">
+            @RenderBody()
+        </div><!-- /main-container -->
+        <!-- Footer
+        ================================================== -->
+        <footer>
+            <div class="row">
+                <div class="col-sm-6">
+                    <span class="footer-brand">
+                        <strong class="text-danger">Wallboard</strong> Admin
+                    </span>
+                    <p class="no-margin">
+                        &copy; 2020 <strong>Wallboard Admin</strong>. ALL Rights Reserved.
+                    </p>
+                </div>
+            </div>
+        </footer>
+        <!--Modal-->
+        <div class="modal fade" id="newFolder">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4>Create new folder</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="folderName">Folder Name</label>
+                                <input type="text" class="form-control input-sm" id="folderName" placeholder="Folder name here...">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-success" data-dismiss="modal" aria-hidden="true">Close</button>
+                        <a href="#" class="btn btn-danger btn-sm">Save changes</a>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </div>
+    <a href="" id="scroll-to-top" class="hidden-print"><i class="fa fa-chevron-up"></i></a>    
+    @Scripts.Render("~/admin/js")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

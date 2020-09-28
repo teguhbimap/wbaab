@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wallboardProjects>
+  <wallboardImageSlide>
+    <imageSlideSeqCd>2</imageSlideSeqCd>
+    <imageSlidePath>gallery11.jpg</imageSlidePath>
+    <imageSlideNote1>100% Responsive</imageSlideNote1>
+    <imageSlideNote2>Easy to customize</imageSlideNote2>
+  </wallboardImageSlide>
+  <wallboardImageSlide>
+    <imageSlideSeqCd>1</imageSlideSeqCd>
+    <imageSlidePath>gallery10.jpg</imageSlidePath>
+    <imageSlideNote1>Wallboard Admin</imageSlideNote1>
+    <imageSlideNote2>Modern web application</imageSlideNote2>
+  </wallboardImageSlide>
+  <wallboardImageSlide>
+    <imageSlideSeqCd>3</imageSlideSeqCd>
+    <imageSlidePath>gallery12.jpg</imageSlidePath>
+    <imageSlideNote1>Wallboard Admin</imageSlideNote1>
+    <imageSlideNote2>Enjoy...</imageSlideNote2>
+  </wallboardImageSlide>
+</wallboardProjects>

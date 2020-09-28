@@ -1,0 +1,311 @@
+﻿@model IEnumerable<wbaab.Models.imageFoto1Model>
+
+@{
+    ViewBag.Title = "ImageFoto1";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section scripts {
+    @*<script src="~/Scripts/signalR/jquery-3.4.1.min.js"></script>*@
+    <script src="~/Scripts/signalR/jquery.signalR-2.4.1.min.js"></script>
+    <script type="text/javascript">
+        //Reference to simpleHub proxy
+        var simpleHubProxy;
+        var url = "@ViewBag.urlSignalR";        
+
+        //Connect to the SignalR server and get the proxy for simpleHub
+        function connect() {
+            console.log("conn");
+
+            $.getScript(url + "/hubs", function () {
+                $.connection.hub.url = url;
+
+                // Declare a proxy to reference the hub.
+                simpleHubProxy = $.connection.simpleHub;
+
+                //Reigster to the "AddMessage" callback method of the hub
+                //This method is invoked by the hub
+                simpleHubProxy.client.addMessage = function (name, message) {
+                    //writeToLog(name + ":" + message);
+                };
+
+                //Connect to hub
+                $.connection.hub.start().done(function () {
+                    //writeToLog("Connected.");
+                    simpleHubProxy.server.setUserName("adm_imgFoto1");
+                });
+            });
+        }
+
+        //Disconnect from the server
+        function disconnect() {
+            if (simpleHubProxy != null) {
+                $.connection.hub.stop();
+                simpleHubProxy = null;
+            }
+        }
+
+        var i = 0;
+        setInterval(function () {
+            i = i + 1;
+            console.log("i : " + i);
+            if (i == 5) {
+                console.log("simpleHubProxy : " + simpleHubProxy);
+                if (simpleHubProxy == null) {
+                    console.log("simpleHubProxy null");
+                    connect();
+                }
+                i = 0;
+            }
+        }, 1000);
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        $("#adminWallboard").addClass("active");
+        $("#adminImageFoto1").addClass("active");
+        //
+        $('#btnSubmit').click(function (e) {
+            e.preventDefault();
+            //
+            var formData = new FormData();
+            var fileUpload = $("#upload-demo").get(0);
+            var files = fileUpload.files;
+            console.log("fileData : " + files[0]);
+
+            for (var i = 0; i < files.length; i++) {
+                formData.append(files[i].name, files[i]);
+            }
+            formData.append("imageFoto1SeqCd", $("#txtImageFoto1SeqCd").val());
+            formData.append("imageFoto1PathOLD", $("#txtImageFoto1Path").val());
+            formData.append("imageFoto1Path", $("#upload-demo").val());
+            formData.append("imageFoto1Title", $("#txtImageFoto1Title").val());
+            formData.append("imageFoto1Note", $("#taImageFoto1Note").val());
+            //console.log($("#txtAuxReasonCode").val());
+
+            objData = {};
+            objData.imageFoto1SeqCd = $("#txtImageFoto1SeqCd").val();
+            objData.imageFoto1PathOld = $("#txtImageFoto1Path").val();
+            objData.imageFoto1Path = $("#upload-demo").val();
+            objData.imageFoto1Title = $("#txtImageFoto1Title").val();
+            objData.imageFoto1Note = $("#taImageFoto1Note").val();
+            //
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("updateImagaFoto1", "Admin", "")',
+                dataType: 'json',
+                contentType: false,
+                processData:false,
+                data: formData,
+                success: function (data) {
+                    if (data.status) {
+                        location.reload();
+                        console.log(data.status);
+                        if (simpleHubProxy != null) {
+                            simpleHubProxy.server.send("Edit");
+                        }
+                    }
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+    });
+    //
+    function delFunction(seqCd, imgPath) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("deleteImageFoto1", "Admin", "")',
+            dataType: 'json',
+            data: {
+                "seqCd": seqCd,
+                "imgPath": imgPath
+            },
+            async: false,
+            success: function (data) {
+                //console.log(data.data.thresholdSeqCd);
+                if (data.status) {
+                    location.reload();
+                    console.log(data.status);
+                    if (simpleHubProxy != null) {
+                        simpleHubProxy.server.send("Delete");
+                    }
+                }
+            },
+            error: function (request, status, error) {
+                alert('error on getPopEdit : ' + request.responseText);
+            }
+        });
+    }
+    function getPopEdit(seqCd) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("getImageFoto1", "Admin", "")',
+            dataType: 'json',
+            data: {
+                "seqCd": seqCd
+            },
+            async: false,
+            success: function (data) {
+                console.log(data.data.imageFoto1SeqCd);
+                $("#txtImageFoto1SeqCd").val(data.data.imageFoto1SeqCd);
+                $("#txtImageFoto1Path").val(data.data.imageFoto1Path);
+                $("#txtImageFoto1Title").val(data.data.imageFoto1Title);
+                $("#taImageFoto1Note").val(data.data.imageFoto1Note);
+                //
+                if (data.data.imageFoto1SeqCd == -1) {
+                    //$('.img-path').addClass("hidden");
+                    $("#btnSubmit").text("New");
+                } else {
+                    $('#frmGroupImage').children().remove();
+                    var srcImage = "<label></label>"
+                        + "<img src='/UploadedFiles/imageFoto1/" + data.data.imageFoto1Path + "' style='height:5%; width:20%' />";
+                    console.log(srcImage);
+                    $('#frmGroupImage').append(srcImage);
+                    $("#btnSubmit").text("Update");
+                }
+            },
+            error: function (request, status, error) {
+                alert('error on getPopEdit : ' + request.responseText);
+            }
+        });
+    };
+    //
+    var _validFileExtensions = [".jpg", ".jpeg", ".png"];
+    function ValidateSingleInput(oInput) {
+        if (oInput.type == "file") {
+            //alert(oInput.files.item(0).size);
+            var sFileName = oInput.value;
+            const fsize = oInput.files.item(0).size;
+            const file = Math.round((fsize / 1024));
+            if (sFileName.length > 0) {
+                var blnValid = false;
+                for (var j = 0; j < _validFileExtensions.length; j++) {
+                    var sCurExtension = _validFileExtensions[j];
+                    if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                        if (file <= 1000000) {
+                        }
+                        blnValid = true;
+                        break;
+                    }
+                }
+
+                if (!blnValid) {
+                    alert("Sorry, " + sFileName + " is invalid, file allowed extensions are: " + _validFileExtensions.join(", "));
+                    oInput.value = "";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+</script>
+<div id="breadcrumb">
+    <ul class="breadcrumb">
+        <li><i class="fa fa-home"></i><a href="Admin/Index"> Admin</a></li>
+        <li class="active">Image Foto 1</li>
+    </ul>
+</div>
+<div class="padding-md">
+    <div class="form-group">
+        <div class="col-sm-10">
+            <a href="#frmEditModal" role="button" data-toggle="modal" class="btn btn-xs btn-success" onclick="getPopEdit(-1)">Add New Slide</a>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-heading">
+                @ViewBag.Title List
+            </div>
+            <div class="panel panel-danger table-responsive">
+                <div class="padding-md clearfix">
+                    @Html.Raw(TempData["msg"])
+                    <table class="table table-striped" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th style="width:15%">Foto</th>
+                                <th style="width:15%">Judul Foto</th>
+                                <th style="width:50%">Keterangan Foto</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td><img src="~/UploadedFiles/imageFoto1/@item.imageFoto1Path" style="height:20%; width:40%" /></td>
+                                        <td>@item.imageFoto1Title</td>
+                                        <td>@item.imageFoto1Note</td>
+                                        <td>
+                                            <a href="#frmEditModal" role="button" data-toggle="modal" class="btn btn-xs btn-warning" onclick="getPopEdit(@item.imageFoto1SeqCd)">Edit</a>
+                                            <a href="#" role="button" class="btn btn-xs btn-danger" onclick="delFunction(@item.imageFoto1SeqCd, '@item.imageFoto1Path')">Delete</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="frmEditModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>@ViewBag.Title Edit Form</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>ImageFoto Code</label>
+                        <input type="text" class="form-control input-sm" id="txtImageFoto1SeqCd" value="-1" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>ImageFoto</label>
+                        <input type="text" class="form-control input-sm" id="txtImageFoto1Path" readonly>
+                    </div>
+                    <div class="form-group" id="frmGroupImage">
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Image</label>
+                        <div class="upload-file">
+                            <input type="file" id="upload-demo" name="upload-demo" class="upload-demo" accept=".jpg, .png, .jpeg|image/*" onchange="ValidateSingleInput(this);">
+                            <label data-title="Select file" for="upload-demo">
+                                <span data-title="No file selected..."></span>
+                            </label>
+                        </div>
+                        <br />
+                        <p class="help-block" style="font-size:10px; color:blue">Image File : (example : .jpg, .png), Max Size File : 1000 MB</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Judul</label>
+                        <input type="text" class="form-control input-sm" id="txtImageFoto1Title" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea class="form-control" rows="3" id="taImageFoto1Note"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger btn-sm" data-dismiss="modal" aria-hidden="true">Close</button>
+                <button class="btn btn-info btn-sm" id="btnSubmit" data-dismiss="modal" aria-hidden="true"></button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<script>
+    $(function () {
+        $('#dataTable').dataTable({
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers"
+        });
+    });
+</script>
+

@@ -1,0 +1,290 @@
+﻿@model IEnumerable<wbaab.Models.videoModel>
+
+
+@{
+    ViewBag.Title = "Video";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section scripts {
+    @*<script src="~/Scripts/signalR/jquery-3.4.1.min.js"></script>*@
+    <script src="~/Scripts/signalR/jquery.signalR-2.4.1.min.js"></script>
+    <script type="text/javascript">
+        //Reference to simpleHub proxy
+        var simpleHubProxy;
+        var url = "@ViewBag.urlSignalR";
+
+        //Connect to the SignalR server and get the proxy for simpleHub
+        function connect() {
+            console.log("conn");
+
+            $.getScript(url + "/hubs", function () {
+                $.connection.hub.url = url;
+
+                // Declare a proxy to reference the hub.
+                simpleHubProxy = $.connection.simpleHub;
+
+                //Reigster to the "AddMessage" callback method of the hub
+                //This method is invoked by the hub
+                simpleHubProxy.client.addMessage = function (name, message) {
+                    //writeToLog(name + ":" + message);
+                };
+
+                //Connect to hub
+                $.connection.hub.start().done(function () {
+                    //writeToLog("Connected.");
+                    simpleHubProxy.server.setUserName("adm_video");
+                });
+            });
+        }
+
+        //Disconnect from the server
+        function disconnect() {
+            if (simpleHubProxy != null) {
+                $.connection.hub.stop();
+                simpleHubProxy = null;
+            }
+        }
+
+        var i = 0;
+        setInterval(function () {
+            i = i + 1;
+            console.log("i : " + i);
+            if (i == 5) {
+                console.log("simpleHubProxy : " + simpleHubProxy);
+                if (simpleHubProxy == null) {
+                    console.log("simpleHubProxy null");
+                    connect();
+                }
+                i = 0;
+            }
+        }, 1000);
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        $("#adminWallboard").addClass("active");
+        $("#adminVideo").addClass("active");
+        //
+        $('#btnSubmit').click(function (e) {
+            //e.preventDefault();
+            //
+            var formData = new FormData();
+            var fileUpload = $("#UploadedFile").get(0);
+            var files = fileUpload.files;
+            console.log("fileData : " + files[0]);
+
+            for (var i = 0; i < files.length; i++) {
+                formData.append(files[i].name, files[i]);
+            }
+            formData.append("videoSeqCd", $("#txtVideoSeqCd").val());
+            formData.append("videoPathOLD", $("#txtVideoPath").val());
+            formData.append("videoPath", $("#UploadedFile").val());
+            formData.append("videoTitle", $("#txtVideoTitle").val());
+            formData.append("videoNote", $("#txtVideoNote").val());
+            //console.log($("#txtAuxReasonCode").val());
+
+            objData = {};
+            objData.videoSeqCd = $("#txtVideoSeqCd").val();
+            objData.videoPathOld = $("#txtVideoPath").val();
+            objData.videoPath = $("#UploadedFile").val();
+            objData.videoTitle = $("#txtVideoTitle").val();
+            objData.videoNote = $("#txtVideoNote").val();
+            //
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("updateVideo", "Admin", "")',
+                dataType: 'json',
+                contentType: false,
+                processData:false,
+                data: formData,
+                success: function (data) {
+                    if (data.status) {
+                        location.reload();
+                        console.log(data.status);
+                        if (simpleHubProxy != null) {
+                            simpleHubProxy.server.send("Edit");
+                        }
+                    }
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+    });
+    //
+    function getPopEdit(seqCd) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("getVideo", "Admin", "")',
+            dataType: 'json',
+            data: {
+                "seqCd": seqCd
+            },
+            async: false,
+            success: function (data) {
+                console.log(data.data.videoSeqCd);
+                $("#txtVideoSeqCd").val(data.data.videoSeqCd);
+                $("#txtVideoPath").val(data.data.videoPath);
+                $("#txtVideoTitle").val(data.data.videoTitle);
+                $("#txtVideoNote").val(data.data.videoNote);
+                //
+                if (data.data.videoSeqCd == -1) {
+                    //$('.img-path').addClass("hidden");
+                    $("#btnSubmit").text("New");
+                } else {
+                    $('#frmGroupVideo').children().remove();
+                    var srcVideo = "<label></label>"
+                        + "<div align='center' class='embed-responsive embed-responsive-4by3'>"
+                        + "<video autoplay muted loop class='embed-responsive-item'>"
+                        + "<source src='/UploadedFiles/video/" + data.data.videoPath + "' type='video/mp4' />"
+                        + "</video>"
+                        + "</div>";
+                    console.log(srcVideo);
+                    $('#frmGroupVideo').append(srcVideo);
+                    $("#btnSubmit").text("Update");
+                }
+            },
+            error: function (request, status, error) {
+                alert('error on getPopEdit : ' + request.responseText);
+            }
+        });
+    };
+    //
+    var _validFileExtensions = [".mp4"];
+    function ValidateSingleInput(oInput) {
+        if (oInput.type == "file") {
+            //alert(oInput.files.item(0).size);
+            var sFileName = oInput.value;
+            const fsize = oInput.files.item(0).size;
+            const file = Math.round((fsize / 1024));
+            if (sFileName.length > 0) {
+                var blnValid = false;
+                for (var j = 0; j < _validFileExtensions.length; j++) {
+                    var sCurExtension = _validFileExtensions[j];
+                    if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                        if (file <= 1000000) {
+                        }
+                        blnValid = true;
+                        break;                        
+                    }
+                }
+
+                if (!blnValid) {
+                    alert("Sorry, " + sFileName + " is invalid, file allowed extensions are: " + _validFileExtensions.join(", "));
+                    oInput.value = "";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+</script>
+<div id="breadcrumb">
+    <ul class="breadcrumb">
+        <li><i class="fa fa-home"></i><a href="Admin/Index"> Admin</a></li>
+        <li class="active">Video Setting</li>
+    </ul>
+</div>
+<div class="padding-md">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-heading">
+                @ViewBag.Title List
+            </div>
+            <div class="panel panel-danger table-responsive">
+                <div class="padding-md clearfix">
+                    @Html.Raw(TempData["msg"])
+                    <table class="table table-striped" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th style="width:15%">Video</th>
+                                <th style="width:15%">Judul Video</th>
+                                <th style="width:50%">Keterangan Video</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div align="center" class="embed-responsive embed-responsive-4by3">
+                                                <video autoplay muted loop class="embed-responsive-item">
+                                                    <source src="/UploadedFiles/video/@item.videoPath" type="video/mp4" />
+                                                </video>
+                                            </div>
+                                        </td>
+                                        <td>@item.videoTitle</td>
+                                        <td>@item.videoNote</td>
+                                        <td>
+                                            <a href="#frmEditModal" role="button" data-toggle="modal" class="btn btn-xs btn-success" onclick="getPopEdit(@item.videoSeqCd)">Edit</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="frmEditModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>@ViewBag.Title Edit Form</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label>Video Code</label>
+                        <input type="text" class="form-control input-sm" id="txtVideoSeqCd" placeholder="videoSeqCd" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Video</label>
+                        <input type="text" class="form-control input-sm" id="txtVideoPath" readonly>
+                    </div>
+                    <div class="form-group" id="frmGroupVideo">
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Video</label>
+                        <div class="upload-file">
+                            <input type="file" id="UploadedFile" name="UploadedFile" class="upload-demo" accept=".mp4, |video/*" onchange="ValidateSingleInput(this);">
+                            <label data-title="Select file" for="UploadedFile">
+                                <span data-title="No file selected..."></span>
+                            </label>
+                        </div>
+                        <br />
+                        <p class="help-block" style="font-size:large">Video File : (example : .mp4), Max Size File : 1000 MB</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Judul</label>
+                        <input type="text" class="form-control input-sm" id="txtVideoTitle" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <input type="text" class="form-control input-sm" id="txtVideoNote" autocomplete="off">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning btn-sm" data-dismiss="modal" aria-hidden="true">Close</button>
+                <button class="btn btn-success btn-sm" id="btnSubmit" data-dismiss="modal" aria-hidden="true">Submit</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<script>
+    $(function () {
+        $('#dataTable').dataTable({
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers"
+        });
+    });
+</script>
+

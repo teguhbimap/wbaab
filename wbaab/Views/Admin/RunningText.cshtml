@@ -1,0 +1,132 @@
+﻿@{
+    ViewBag.Title = "RunningText";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section scripts {
+    @*<script src="~/Scripts/signalR/jquery-3.4.1.min.js"></script>*@
+    <script src="~/Scripts/signalR/jquery.signalR-2.4.1.min.js"></script>
+    <script type="text/javascript">
+        //Reference to simpleHub proxy
+        var simpleHubProxy;
+        var url = "@ViewBag.urlSignalR";        
+
+        //Connect to the SignalR server and get the proxy for simpleHub
+        function connect() {
+            console.log("conn");
+
+            $.getScript(url + "/hubs", function () {
+                $.connection.hub.url = url;
+
+                // Declare a proxy to reference the hub.
+                simpleHubProxy = $.connection.simpleHub;
+
+                //Reigster to the "AddMessage" callback method of the hub
+                //This method is invoked by the hub
+                simpleHubProxy.client.addMessage = function (name, message) {
+                    //writeToLog(name + ":" + message);
+                };
+
+                //Connect to hub
+                $.connection.hub.start().done(function () {
+                    //writeToLog("Connected.");
+                    simpleHubProxy.server.setUserName("adm_runningText");
+                });
+            });
+        }
+
+        //Disconnect from the server
+        function disconnect() {
+            if (simpleHubProxy != null) {
+                $.connection.hub.stop();
+                simpleHubProxy = null;
+            }
+        }
+
+        var i = 0;
+        setInterval(function () {
+            i = i + 1;
+            console.log("i : " + i);
+            if (i == 5) {
+                console.log("simpleHubProxy : " + simpleHubProxy);
+                if (simpleHubProxy == null) {
+                    console.log("simpleHubProxy null");
+                    connect();
+                }
+                i = 0;
+            }
+        }, 1000);
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        $("#adminWallboard").addClass("active");
+        $("#adminRunningText").addClass("active");
+        //
+        $("#txtRunningTextSeqCd").val("@ViewBag.RunningTextSeqCd");
+        $("#txtRunningText").val("@ViewBag.RunningText");
+        //
+        $('#btnUpdate').click(function (e) {
+                e.preventDefault();
+
+                objData = {};
+                var id = $("#txtRunningTextSeqCd").val();
+                var runningText = $("#txtRunningText").val();
+
+                $.ajax({
+                    url: '@Url.Action("postRunningText", "Admin", new { area = "" })',
+                    dataType: "json",
+                    type: "POST",
+                    data: {
+                        "id": id,
+                        "runningText": runningText
+                    },
+
+                    success: function (data) {                          
+                        if (data.status) {                            
+                            if (simpleHubProxy != null) {
+                                simpleHubProxy.server.send("Edit");
+                            }
+                            location.reload();
+                        }
+                    },
+                    error: function (request, status, error) {
+
+                    }
+                });
+         });
+    });
+</script>
+<div id="breadcrumb">
+    <ul class="breadcrumb">
+        <li><i class="fa fa-home"></i><a href="Admin/Index"> Admin</a></li>
+        <li class="active">Running Text</li>
+    </ul>
+</div>
+<div class="padding-md">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-heading">
+                @ViewBag.Title
+            </div>
+            <div class="panel-body">
+                @Html.Raw(TempData["msg"])
+                <form class="form-horizontal no-margin form-border">
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">Running Text</label>
+                        <div class="col-lg-10">
+                            <input id="txtRunningText" class="form-control" type="text" placeholder="input here..."autocomplete="off">
+                            <input id="txtRunningTextSeqCd" class="form-control" type="hidden" placeholder="input here...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-2 col-lg-10">
+                            <button id="btnUpdate" type="submit" class="btn btn-success btn-sm">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

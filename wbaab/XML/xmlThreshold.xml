@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wallboardProjects>
+  <wallboardThreshold>
+    <thresholdSeqCd>0</thresholdSeqCd>
+    <thresholdName>AUX</thresholdName>
+    <thresholdTime>0</thresholdTime>
+  </wallboardThreshold>
+  <wallboardThreshold>
+    <thresholdSeqCd>3</thresholdSeqCd>
+    <thresholdName>Pray</thresholdName>
+    <thresholdTime>900</thresholdTime>
+  </wallboardThreshold>
+  <wallboardThreshold>
+    <thresholdSeqCd>2</thresholdSeqCd>
+    <thresholdName>Toilet</thresholdName>
+    <thresholdTime>300</thresholdTime>
+  </wallboardThreshold>
+  <wallboardThreshold>
+    <thresholdSeqCd>4</thresholdSeqCd>
+    <thresholdName>Coaching</thresholdName>
+    <thresholdTime>1800</thresholdTime>
+  </wallboardThreshold>
+  <wallboardThreshold>
+    <thresholdSeqCd>7</thresholdSeqCd>
+    <thresholdName>Meeting</thresholdName>
+    <thresholdTime>1800</thresholdTime>
+  </wallboardThreshold>
+  <wallboardThreshold>
+    <thresholdSeqCd>6</thresholdSeqCd>
+    <thresholdName>Break</thresholdName>
+    <thresholdTime>900</thresholdTime>
+  </wallboardThreshold>
+  <wallboardThreshold>
+    <thresholdSeqCd>1</thresholdSeqCd>
+    <thresholdName>Lunch</thresholdName>
+    <thresholdTime>3600</thresholdTime>
+  </wallboardThreshold>
+  <wallboardThreshold>
+    <thresholdSeqCd>5</thresholdSeqCd>
+    <thresholdName>Walk In</thresholdName>
+    <thresholdTime>300</thresholdTime>
+  </wallboardThreshold>
+</wallboardProjects>
