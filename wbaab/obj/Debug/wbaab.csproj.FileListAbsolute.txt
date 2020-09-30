@@ -55,4 +55,3 @@ E:\a\wbaab\wbaab\bin\System.Web.WebPages.Deployment.xml
 E:\a\wbaab\wbaab\bin\System.Web.WebPages.Razor.xml
 E:\a\wbaab\wbaab\obj\Debug\wbaab.dll
 E:\a\wbaab\wbaab\obj\Debug\wbaab.pdb
-E:\a\wbaab\wbaab\obj\Debug\wbaab.csprojResolveAssemblyReference.cache

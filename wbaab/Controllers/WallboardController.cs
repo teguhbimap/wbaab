@@ -19,5 +19,10 @@ namespace wbaab.Controllers
             ViewBag.urlSignalR = URL_SIGNAL;
             return View();
         }
+        public ActionResult View3()
+        {
+            ViewBag.urlSignalR = URL_SIGNAL;
+            return View();
+        }
     }
 }
